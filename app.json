@@ -1,0 +1,25 @@
+{
+  "name": "direction",
+  "displayName": "directionMap",
+  "expo": {
+    "name": "direction",
+    "slug": "expo-template-bare",
+    "privacy": "unlisted",
+    "sdkVersion": "34.0.0",
+    "version": "1.0.0",
+    "android": {
+      "package": "com.directionMap.directionMap",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyD-HGIdv5ZbVl6iB5jthaqjGdQc03kMbmc"
+        }
+      }
+    },
+    "entryPoint": "node_modules/expo/AppEntry.js",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
+  }
+}
