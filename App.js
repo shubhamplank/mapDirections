@@ -4,7 +4,7 @@ import React, { Component } from "react";
 import { Text, TextInput, StyleSheet, View, Dimensions } from "react-native";
 import MapView from 'react-native-maps';
 import Polyline from '@mapbox/polyline';
-import { LatRegex, LongRegex } from './constants';
+import { LatRegex, LongRegex, key } from './constants';
 
 class App extends Component {
   constructor(props) {
@@ -17,8 +17,8 @@ class App extends Component {
       concat: null,
       coords: [],
       x: 'false',
-      cordLatitude: 27.1,
-      cordLongitude: 77.1,
+      destinatinoLat: 27.1,
+      destinatinoLong: 77.1,
     };
     this.mergeLot = this.mergeLot.bind(this);
   }
@@ -42,7 +42,7 @@ class App extends Component {
   mergeLot() {
     if (this.state.latitude != null && this.state.longitude != null) {
       let currentLocation = this.state.latitude + "," + this.state.longitude;
-      let destinationLocation = this.state.cordLatitude + "," + this.state.cordLongitude
+      let destinationLocation = this.state.destinatinoLat + "," + this.state.destinatinoLong
       this.setState({
         concat: currentLocation
       }, () => {
@@ -55,7 +55,7 @@ class App extends Component {
   async getDirections(startLoc, destinationLoc) {
 
     try {
-      let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${destinationLoc}`)
+      let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${destinationLoc}&key=${key}`)
       let respJson = await resp.json();
       let points = Polyline.decode(respJson.routes[0].overview_polyline.points);
       let coords = points.map((point, index) => {
@@ -91,8 +91,8 @@ class App extends Component {
               title={"Location"}
             />}
 
-            {!!this.state.cordLatitude && !!this.state.cordLongitude && <MapView.Marker
-              coordinate={{ "latitude": this.state.cordLatitude, "longitude": this.state.cordLongitude }}
+            {!!this.state.destinatinoLat && !!this.state.destinatinoLong && <MapView.Marker
+              coordinate={{ "latitude": this.state.destinatinoLat, "longitude": this.state.destinatinoLong }}
               title={"Destination"}
             />}
 
@@ -105,7 +105,7 @@ class App extends Component {
             {!!this.state.latitude && !!this.state.longitude && this.state.x == 'error' && <MapView.Polyline
               coordinates={[
                 { latitude: this.state.latitude, longitude: this.state.longitude },
-                { latitude: this.state.cordLatitude, longitude: this.state.cordLongitude },
+                { latitude: this.state.destinatinoLat, longitude: this.state.destinatinoLong },
               ]}
               strokeWidth={2}
               strokeColor="blue" />
@@ -116,14 +116,14 @@ class App extends Component {
           <TextInput
             keyboardType={'numeric'}
             style={styles.input}
-            onChangeText={(text) => LatRegex.test(text) ? this.setState({ latitude: parseInt(text) }) : this.setState({ latitude: 0 })}
+            onChangeText={(text) => LatRegex.test(text) ? this.setState({ destinatinoLat: parseInt(text) }) : this.setState({ destinatinoLat: 0 })}
             value={this.state.text}
             placeholder='Latitude'
           />
           <TextInput
             keyboardType={'numeric'}
             style={styles.input}
-            onChangeText={(text) => LongRegex.test(text) ? this.setState({ longitude: parseInt(text) }) : this.setState({ longitude: 0 })}
+            onChangeText={(text) => LongRegex.test(text) ? this.setState({ destinatinoLong: parseInt(text) }) : this.setState({ destinatinoLong: 0 })}
             value={this.state.text}
             placeholder='Longitude'
           />
