@@ -1,31 +1,30 @@
 
 
 import React, { Component } from "react";
-import { Text, TextInput, StyleSheet, View, Dimensions } from "react-native";
+import { Text, TextInput, StyleSheet, View, Dimensions, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from "react-native";
 import MapView from 'react-native-maps';
 import Polyline from '@mapbox/polyline';
 import { LatRegex, LongRegex, key } from './constants';
+
 
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      latitude: 28.2,
-      longitude: 77.2,
+      latitude: null,
+      longitude: null,
       error: null,
       concat: null,
       coords: [],
-      x: 'false',
-      destinatinoLat: 27.1,
+      isPath: 'false',
+      destinatinoLat: 28.7,
       destinatinoLong: 77.1,
     };
-    
     this.mergeLot = this.mergeLot.bind(this);
   }
 
   componentDidMount() {
-    console.log('didmMount-------------', this.state)
     navigator.geolocation.getCurrentPosition(
       (position) => {
         this.setState({
@@ -38,11 +37,14 @@ class App extends Component {
       (error) => this.setState({ error: error.message }),
       { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 },
     );
-   
+
   }
 
+
+
+
+
   mergeLot() {
-    console.log('MergeLot-------------', this.state)
     if (this.state.latitude != null && this.state.longitude != null) {
       let currentLocation = this.state.latitude + "," + this.state.longitude;
       let destinationLocation = this.state.destinatinoLat + "," + this.state.destinatinoLong
@@ -52,18 +54,13 @@ class App extends Component {
         this.getDirections(currentLocation, destinationLocation);
       });
     }
-    
-
   }
 
   async getDirections(startLoc, destinationLoc) {
 
     try {
-      console.log('Getdirection-------------', this.state)
       let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${destinationLoc}&key=${key}`)
       let respJson = await resp.json();
-      console.log('-------------------------inside get direction-----------------------');
-      console.log(respJson);
       let points = Polyline.decode(respJson.routes[0].overview_polyline.points);
       let coords = points.map((point, index) => {
         return {
@@ -72,68 +69,85 @@ class App extends Component {
         }
       })
       this.setState({ coords: coords })
-      this.setState({ x: "true" })
-      return coords
+      this.setState({ isPath: "true" })
+
     } catch (error) {
-      console.log(error)
-      this.setState({ x: "error" })
+
+      this.setState({ isPath: "error" })
+
       return error
     }
   }
 
+  onPress() {
+    Keyboard.dismiss();
+    this.mergeLot();
+  }
+
   render() {
-    console.log('Render-------------', this.state)
+    const { latitude, longitude, error, concat, coords, isPath, destinatinoLat, destinatinoLong } = this.state;
     return (
       <View>
         <View>
           <MapView style={styles.map} initialRegion={{
-            latitude: this.state.latitude,
-            longitude: this.state.longitude,
+            latitude: destinatinoLat,
+            longitude: destinatinoLong,
             latitudeDelta: 1,
             longitudeDelta: 1
           }}>
 
-            {!!this.state.latitude && !!this.state.longitude && <MapView.Marker
-              coordinate={{ "latitude": this.state.latitude, "longitude": this.state.longitude }}
+            {!!latitude && !!longitude && <MapView.Marker
+              coordinate={{ "latitude": latitude, "longitude": longitude }}
               title={"Location"}
             />}
 
-            {!!this.state.destinatinoLat && !!this.state.destinatinoLong && <MapView.Marker
-              coordinate={{ "latitude": this.state.destinatinoLat, "longitude": this.state.destinatinoLong }}
+            {!!destinatinoLat && !!destinatinoLong && <MapView.Marker
+              coordinate={{ "latitude": destinatinoLat, "longitude": destinatinoLong }}
               title={"Destination"}
             />}
 
-            {!!this.state.latitude && !!this.state.longitude && this.state.x == 'true' && <MapView.Polyline
-              coordinates={this.state.coords}
-              strokeWidth={2}
-              strokeColor="green" />
+            {!!latitude && !!longitude && isPath == 'true' && <MapView.Polyline
+              coordinates={coords}
+              strokeWidth={3}
+              strokeColor="#6D81FC" />
             }
 
-            {!!this.state.latitude && !!this.state.longitude && this.state.x == 'error' && <MapView.Polyline
+            {!!latitude && !!longitude && isPath == 'error' && <MapView.Polyline
               coordinates={[
-                { latitude: this.state.latitude, longitude: this.state.longitude },
-                { latitude: this.state.destinatinoLat, longitude: this.state.destinatinoLong },
+                { latitude: latitude, longitude: longitude },
+                { latitude: destinatinoLat, longitude: destinatinoLong },
               ]}
               strokeWidth={2}
-              strokeColor="blue" />
+              strokeColor="red" />
             }
           </MapView>
         </View>
         <View style={styles.box}>
-          <TextInput
-            keyboardType={'numeric'}
-            style={styles.input}
-            onChangeText={(text) => LatRegex.test(text) ? this.setState({ destinatinoLat: parseInt(text) }) : this.setState({ destinatinoLat: 0 })}
-            value={this.state.text}
-            placeholder='Latitude'
-          />
-          <TextInput
-            keyboardType={'numeric'}
-            style={styles.input}
-            onChangeText={(text) => LongRegex.test(text) ? this.setState({ destinatinoLong: parseInt(text) }) : this.setState({ destinatinoLong: 0 })}
-            value={this.state.text}
-            placeholder='Longitude'
-          />
+          <View style={{ flexDirection: 'row' }}>
+            <TextInput
+              keyboardType={'numeric'}
+              style={styles.input}
+              onChangeText={(text) => LatRegex.test(text) ? this.setState({ destinatinoLat: parseInt(text) }) : true}
+              value={this.state.text}
+              placeholder='Latitude'
+            />
+            <TextInput
+              keyboardType={'numeric'}
+              style={styles.input}
+              onChangeText={(text) => LongRegex.test(text) ? this.setState({ destinatinoLong: parseInt(text) }) : true}
+              value={this.state.text}
+              placeholder='Longitude'
+            />
+          </View>
+          <View>
+            <TouchableOpacity
+              onPress={() => this.onPress()}
+              style={styles.button}
+            >
+              <Text style={{ textAlign: 'center', marginTop: 4 }}> Go </Text>
+            </TouchableOpacity>
+          </View>
+
         </View>
       </View>
 
@@ -152,26 +166,35 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height
   },
+  box: {
+    height: 40,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
   input: {
     width: 140,
     height: 40,
-    margin: 2,
+    margin: 1,
     backgroundColor: 'white',
-    borderRadius: 15,
+    borderRadius: 25,
     borderWidth: 2,
     borderColor: '#00bfff',
     marginTop: 40,
     padding: 3,
     textAlign: 'center'
   },
-  box: {
+  button: {
+    width: 60,
     height: 40,
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
+    backgroundColor: 'white',
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: '#00bfff',
+    marginTop: 40,
+    padding: 3,
+    textAlign: 'center'
   }
 });
-
-
 export default App;
 
