@@ -20,10 +20,12 @@ class App extends Component {
       destinatinoLat: 27.1,
       destinatinoLong: 77.1,
     };
+    
     this.mergeLot = this.mergeLot.bind(this);
   }
 
   componentDidMount() {
+    console.log('didmMount-------------', this.state)
     navigator.geolocation.getCurrentPosition(
       (position) => {
         this.setState({
@@ -36,10 +38,11 @@ class App extends Component {
       (error) => this.setState({ error: error.message }),
       { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 },
     );
-
+   
   }
 
   mergeLot() {
+    console.log('MergeLot-------------', this.state)
     if (this.state.latitude != null && this.state.longitude != null) {
       let currentLocation = this.state.latitude + "," + this.state.longitude;
       let destinationLocation = this.state.destinatinoLat + "," + this.state.destinatinoLong
@@ -49,14 +52,18 @@ class App extends Component {
         this.getDirections(currentLocation, destinationLocation);
       });
     }
+    
 
   }
 
   async getDirections(startLoc, destinationLoc) {
 
     try {
+      console.log('Getdirection-------------', this.state)
       let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${destinationLoc}&key=${key}`)
       let respJson = await resp.json();
+      console.log('-------------------------inside get direction-----------------------');
+      console.log(respJson);
       let points = Polyline.decode(respJson.routes[0].overview_polyline.points);
       let coords = points.map((point, index) => {
         return {
@@ -75,7 +82,7 @@ class App extends Component {
   }
 
   render() {
-
+    console.log('Render-------------', this.state)
     return (
       <View>
         <View>
