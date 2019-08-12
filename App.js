@@ -1,29 +1,26 @@
 
 
 import React, { Component } from "react";
-import { TextInput, StyleSheet, View, Dimensions } from "react-native";
+import { Text, TextInput, StyleSheet, View, Dimensions } from "react-native";
 import MapView from 'react-native-maps';
 import Polyline from '@mapbox/polyline';
+import { LatRegex, LongRegex } from './constants';
 
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      latitude: null,
-      longitude: null,
+      latitude: 28.2,
+      longitude: 77.2,
       error: null,
       concat: null,
       coords: [],
       x: 'false',
-      cordLatitude: 28.5048,
-      cordLongitude: 77.0970,
+      cordLatitude: 27.1,
+      cordLongitude: 77.1,
     };
-
     this.mergeLot = this.mergeLot.bind(this);
-    
-
-
   }
 
   componentDidMount() {
@@ -76,23 +73,11 @@ class App extends Component {
       return error
     }
   }
- 
+
   render() {
 
     return (
       <View>
-        <TextInput
-          style={styles.input}
-          onChangeText={ (text) => text !=='' ? this.setState({latitude: parseInt(text)}): this.setState({longitude: 0})}
-          value={this.state.text}
-          placeholder = 'Latitude'
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => text !=='' ? this.setState({longitude: parseInt(text)}): this.setState({longitude: 0})}
-          value={this.state.text}
-          placeholder = 'Longitude'
-        />
         <View>
           <MapView style={styles.map} initialRegion={{
             latitude: this.state.latitude,
@@ -123,11 +108,26 @@ class App extends Component {
                 { latitude: this.state.cordLatitude, longitude: this.state.cordLongitude },
               ]}
               strokeWidth={2}
-              strokeColor="red" />
+              strokeColor="blue" />
             }
           </MapView>
         </View>
-
+        <View style={styles.box}>
+          <TextInput
+            keyboardType={'numeric'}
+            style={styles.input}
+            onChangeText={(text) => LatRegex.test(text) ? this.setState({ latitude: parseInt(text) }) : this.setState({ latitude: 0 })}
+            value={this.state.text}
+            placeholder='Latitude'
+          />
+          <TextInput
+            keyboardType={'numeric'}
+            style={styles.input}
+            onChangeText={(text) => LongRegex.test(text) ? this.setState({ longitude: parseInt(text) }) : this.setState({ longitude: 0 })}
+            value={this.state.text}
+            placeholder='Longitude'
+          />
+        </View>
       </View>
 
     );
@@ -146,13 +146,22 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').height
   },
   input: {
+    width: 140,
     height: 40,
-    borderColor: 'blue',
-    borderWidth: 1,
-    borderRadius: 8,
-    marginTop: 3,
+    margin: 2,
+    backgroundColor: 'white',
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#00bfff',
+    marginTop: 40,
     padding: 3,
     textAlign: 'center'
+  },
+  box: {
+    height: 40,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
   }
 });
 
