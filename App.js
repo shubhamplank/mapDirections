@@ -87,12 +87,8 @@ class App extends Component {
             longitude: destinatinoLong,
             latitudeDelta: 1,
             longitudeDelta: 1
-          }}>
-
-            {!!latitude && !!longitude && <MapView.Marker
-              coordinate={{ "latitude": latitude, "longitude": longitude }}
-              title={"Location"}
-            />}
+          }}
+          showsUserLocation={true}>
 
             {!!destinatinoLat && !!destinatinoLong && <MapView.Marker
               coordinate={{ "latitude": destinatinoLat, "longitude": destinatinoLong }}
