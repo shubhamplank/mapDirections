@@ -1,6 +1,6 @@
 # mapDirections
 
-To run the project do, you must have npm/yarn and expo-cli installed on IDE, and run the following:
+To run the project you must have npm/yarn and expo-cli installed on IDE, and run the following:
 
 $git clone https://github.com/shubhamplank/mapDirections.git
 $yarn 
