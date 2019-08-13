@@ -39,11 +39,6 @@ class App extends Component {
     );
 
   }
-
-
-
-
-
   mergeLot() {
     if (this.state.latitude != null && this.state.longitude != null) {
       let currentLocation = this.state.latitude + "," + this.state.longitude;
@@ -72,9 +67,7 @@ class App extends Component {
       this.setState({ isPath: "true" })
 
     } catch (error) {
-
       this.setState({ isPath: "error" })
-
       return error
     }
   }
@@ -147,7 +140,6 @@ class App extends Component {
               <Text style={{ textAlign: 'center', marginTop: 4 }}> Go </Text>
             </TouchableOpacity>
           </View>
-
         </View>
       </View>
 
